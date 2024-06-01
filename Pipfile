@@ -5,6 +5,14 @@ name = "pypi"
 
 [packages]
 dj-config-url = "*"
+django = "*"
+path = "*"
+api = "*"
+djangorestframework = "*"
+status = "*"
+bcrypt = "*"
+utils = "*"
+response = "*"
 
 [dev-packages]
 
