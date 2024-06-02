@@ -88,7 +88,10 @@ DATABASES = {
         'postgres://uedtdgjg9is2bp:p66e3a268b29703725b594c71ea76ee9925aec5bcbed9b496bc1132dcefe03e31@cdeuajkr4sf66s.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d8mkjccpkl6f3b')
 }
 
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+# SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
