@@ -65,15 +65,15 @@ def get_user_detail(request):
 def user_detail_edit(request):
     data = request.data
     # data = request.query_params
-    user_id = data.get('user_id')
+    email = data.get('email')
 
-    user = User.objects.filter(pk=user_id)
+    user = User.objects.filter(pk=email)
 
     if not user.exists():
         return Response({'success': False, 'message': '沒有此帳號'}, status=status.HTTP_404_NOT_FOUND)
 
     try:
-        user.update(name=data['name'], live=data['live'], borth=data['borth'])
+        user.update(name=data['name'], gender=data['gender'], live=data['live'], phone=data['phone'], about=data['about'])
         return Response({'success': True, 'message': '編輯成功'})
     except:
         return Response({'success': False, 'message': '編輯失敗'}, status=status.HTTP_400_BAD_REQUEST)
