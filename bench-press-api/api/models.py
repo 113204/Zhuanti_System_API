@@ -11,6 +11,7 @@ class User(models.Model):
     live = models.CharField(max_length=150)
     phone = models.CharField(max_length=15)
     permission = models.IntegerField()
+    about = models.CharField(max_length=300)
 
     class Meta:
         managed = False
