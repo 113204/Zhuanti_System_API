@@ -12,6 +12,7 @@ urlpatterns = [
     path('test/', get_user_detail_test),
     path('detail/', get_user_detail),
     path('detail/edit/', user_detail_edit),
+    path('pass/edit/', user_pass_edit)
 
     # 學姊的範例測試
     # path('get/<int:pk>/', get_review),

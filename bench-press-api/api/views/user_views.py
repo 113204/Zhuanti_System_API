@@ -77,3 +77,21 @@ def user_detail_edit(request):
         return Response({'success': True, 'message': '編輯成功'})
     except:
         return Response({'success': False, 'message': '編輯失敗'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@user_login_required
+def user_pass_edit(request):
+    data = request.data
+    # data = request.query_params
+    email = data.get('email')
+
+    user = User.objects.filter(pk=email)
+
+    if not user.exists():
+        return Response({'success': False, 'message': '沒有此帳號'}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        user.update(password=data['password'])
+        return Response({'success': True, 'message': '編輯成功'})
+    except:
+        return Response({'success': False, 'message': '編輯失敗'}, status=status.HTTP_400_BAD_REQUEST)
