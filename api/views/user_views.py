@@ -35,7 +35,7 @@ def get_user_detail_test(request):
 
 # 個人資料顯示頁面
 @api_view()
-@user_login_required
+# @user_login_required
 def get_user_detail(request):
     data = request.query_params
     email = data.get('email')
