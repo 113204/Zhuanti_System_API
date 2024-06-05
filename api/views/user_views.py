@@ -61,7 +61,7 @@ def get_user_detail(request):
 
 # 個人資料編輯
 @api_view(['POST'])
-@user_login_required
+# @user_login_required
 def user_detail_edit(request):
     data = request.data
     # data = request.query_params
