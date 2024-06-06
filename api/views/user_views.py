@@ -25,7 +25,7 @@ def get_user_detail_test(request):
                 'email': user.pk,
                 'name': user.name,
                 'gender': user.gender,
-                'live': user.live,
+                # 'live': user.live,
                 'phone': user.phone,
             }
             for user in users
@@ -49,7 +49,7 @@ def get_user_detail(request):
                 'name': user.name,
                 'email': user.pk,
                 'gender': user.gender,
-                'live': user.live,
+                # 'live': user.live,
                 'phone': user.phone,
                 'about': user.about,
             }
@@ -73,7 +73,7 @@ def user_detail_edit(request):
         return Response({'success': False, 'message': '沒有此帳號'}, status=status.HTTP_404_NOT_FOUND)
 
     try:
-        user.update(name=data['name'], gender=data['gender'], live=data['live'], phone=data['phone'], about=data['about'])
+        user.update(name=data['name'], gender=data['gender'], phone=data['phone'], about=data['about'])
         return Response({'success': True, 'message': '編輯成功'})
     except:
         return Response({'success': False, 'message': '編輯失敗'}, status=status.HTTP_400_BAD_REQUEST)

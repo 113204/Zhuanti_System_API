@@ -60,7 +60,7 @@ def register(request):
     # 新增使用者資料
     try:
         User.objects.create(email=data['email'], name=data['name'], password=data['password'],
-                            gender=data['gender'], live=data['live'],
+                            gender=data['gender'],
                             # photo=data['photo'],
                             # photo=photo_string,
                             phone=data['phone'], permission=data['permission'])
