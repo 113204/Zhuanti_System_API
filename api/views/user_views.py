@@ -74,9 +74,9 @@ def user_detail_edit(request):
 
     try:
         user.update(name=data['name'], gender=data['gender'], phone=data['phone'], about=data['about'])
-        return Response({'success': True, 'message': '編輯成功'})
+        return Response({'success': True})
     except:
-        return Response({'success': False, 'message': '編輯失敗'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 # @user_login_required
@@ -92,6 +92,6 @@ def user_pass_edit(request):
 
     try:
         user.update(password=data['password'])
-        return Response({'success': True, 'message': '密碼更改成功'})
+        return Response({'success': True})
     except:
-        return Response({'success': False, 'message': '密碼更改失敗'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)

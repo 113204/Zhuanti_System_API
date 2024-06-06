@@ -19,7 +19,7 @@ from utils.decorators import user_login_required
 def logout(request):
     data = request.data
     request.session.flush()
-    return Response({'success': True, 'message': '登出成功'})
+    return Response({'success': True})
 
 
 # 登入
@@ -39,13 +39,13 @@ def login(request):
             # 密码匹配，进行登录操作
             request.session['email'] = user.email
             request.session.save()
-            return Response({'success': True, 'message': '登入成功', 'sessionid': request.session.session_key})
+            return Response({'success': True, 'sessionid': request.session.session_key})
         else:
             # 密码不匹配，返回登录页面并显示错误消息
-            return Response({'success': False, 'message': '帳號或密碼錯誤'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)
 
     except User.DoesNotExist:
-        return Response({'success': False, 'message': '登入失敗，帳號或密碼錯誤'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)
 
 
 # 註冊
@@ -65,14 +65,14 @@ def register(request):
                             # photo=photo_string,
                             phone=data['phone'], permission=data['permission'])
 
-        return Response({'success': True, 'message': '註冊成功'})
+        return Response({'success': True})
 
 
     except IntegrityError:
-        return Response({'success': False, 'message': '此帳號已被註冊'}, status=status.HTTP_409_CONFLICT)
+        return Response({'success': False}, status=status.HTTP_409_CONFLICT)
 
     except:
-        return Response({'success': False, 'message': '輸入格式錯誤，請確認電話及其他欄位的填寫格式'},
+        return Response({'success': False},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
