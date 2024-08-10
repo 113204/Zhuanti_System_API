@@ -18,7 +18,7 @@ class User(models.Model):
         db_table = 'user'
 
 class Post(models.Model):
-    no = models.AutoField(primary_key=True)
+    no = models.IntegerField(primary_key=True)
     usermail = models.ForeignKey(User, models.DO_NOTHING, db_column='usermail')
     title = models.TextField()
     text = models.TextField()
@@ -28,7 +28,7 @@ class Post(models.Model):
         db_table = 'discuss_post'
 
 class Message(models.Model):
-    no = models.AutoField(primary_key=True)
+    no = models.IntegerField(primary_key=True)
     nopost = models.ForeignKey(Post, models.DO_NOTHING, db_column='nopost')
     usermail = models.ForeignKey(User, models.DO_NOTHING, db_column='usermail')
     text = models.TextField()

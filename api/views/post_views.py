@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
-from api.models import Post, Message
+from api.models import Post, Message, User
 
 from utils.decorators import user_login_required
 
@@ -89,20 +89,34 @@ def get_post_message(request, nopost):
 @api_view(['POST'])
 def addpost(request):
     data = request.data
+    print("Received data:", data)  # 打印接收到的数据
 
-    # 新增文章資料
+    no = data.get('no')
+    usermail_str = data.get('usermail')
+    title = data.get('title')
+    text = data.get('text')
+
+    if not usermail_str or not title or not text:
+        print("Missing required fields")  # 打印缺少字段的信息
+        return Response({'success': False, 'message': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
-        Post.objects.create(no=data['no'], usermail=data['usermail'], text=data['text'])
+        user = User.objects.get(email=usermail_str)
+    except User.DoesNotExist:
+        print("User not found:", usermail_str)  # 打印用户未找到的信息
+        return Response({'success': False, 'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
+    try:
+        Post.objects.create(no=no, usermail=user, title=title, text=text)
         return Response({'success': True})
-
-
-    except IntegrityError:
-        return Response({'success': False}, status=status.HTTP_409_CONFLICT)
-
-    except:
-        return Response({'success': False},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except IntegrityError as e:
+        print(f'IntegrityError: {e}')  # 打印完整性错误信息
+        return Response({'success': False, 'message': 'Integrity error'}, status=status.HTTP_409_CONFLICT)
+    except Exception as e:
+        import traceback
+        print(f'Error in addpost: {e}')
+        traceback.print_exc()
+        return Response({'success': False, 'message': f'Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # 新增文章
 @api_view(['POST'])
