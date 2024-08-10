@@ -21,4 +21,5 @@ urlpatterns = [
     # path('admin/', admin.site.urls),
     path('api/auth/', include('api.urls.auth_urls')),
     path('api/user/', include('api.urls.user_urls')),
+    path('api/post/', include('api.urls.post_urls')),
 ]
