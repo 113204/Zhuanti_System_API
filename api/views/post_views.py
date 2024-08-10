@@ -55,16 +55,20 @@ def get_post(request, no):
 @api_view(['GET'])
 def get_post_message(request, nopost):
     try:
+        # 确保 `nopost` 是有效的整数
+        try:
+            nopost = int(nopost)
+        except ValueError:
+            return JsonResponse({'success': False, 'message': 'Invalid `nopost` parameter'}, status=400)
+
         # 获取与 `nopost` 关联的所有消息
         messages = Message.objects.filter(nopost=nopost)
-        if not messages.exists():
-            return JsonResponse({'success': False, 'message': 'No messages found'}, status=404)
 
         # 构建消息列表
         message_list = [
             {
                 'no': message.pk,
-                'nopost': message.nopost_id,  # 确保只返回 Post 的主键
+                'nopost': message.nopost,  # 确保只返回 Post 的主键
                 'usermail': message.usermail.name,
                 'text': message.text,
             }
