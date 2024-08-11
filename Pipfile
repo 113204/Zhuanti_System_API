@@ -16,6 +16,7 @@ psycopg2-binary = "*"
 utils = "*"
 decorators = "*"
 bcrypt = "*"
+pytz = "*"
 
 [dev-packages]
 

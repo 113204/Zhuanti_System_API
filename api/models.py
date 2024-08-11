@@ -18,20 +18,22 @@ class User(models.Model):
         db_table = 'user'
 
 class Post(models.Model):
-    no = models.IntegerField(primary_key=True)
+    no = models.AutoField(primary_key=True)
     usermail = models.ForeignKey(User, models.DO_NOTHING, db_column='usermail')
     title = models.TextField()
     text = models.TextField()
+    date = models.DateTimeField()
 
     class Meta:
         managed = False
         db_table = 'discuss_post'
 
 class Message(models.Model):
-    no = models.IntegerField(primary_key=True)
+    no = models.AutoField(primary_key=True)
     nopost = models.ForeignKey(Post, models.DO_NOTHING, db_column='nopost')
     usermail = models.ForeignKey(User, models.DO_NOTHING, db_column='usermail')
     text = models.TextField()
+    date = models.DateTimeField()
 
     class Meta:
         managed = False
