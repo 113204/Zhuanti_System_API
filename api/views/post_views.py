@@ -139,6 +139,7 @@ def addpost(request):
         print(f'Error in addpost: {e}')
         traceback.print_exc()
         return Response({'success': False, 'message': f'Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 # 新增留言
 @api_view(['POST'])
 def addmessage(request):
@@ -186,6 +187,57 @@ def addmessage(request):
     except Exception as e:
         import traceback
         print(f'Error in addmessage: {e}')
+        traceback.print_exc()
+        return Response({'success': False, 'message': f'Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+def editpost(request):
+    data = request.data
+    print("Received data:", data)  # 打印接收到的数据
+
+    no = data.get('no')  # 获取要编辑的帖子 ID
+    usermail_str = data.get('usermail')
+    title = data.get('title')
+    text = data.get('text')
+    date = data.get('date')  # 获取前端传递的日期时间字符串
+
+    if not no or not usermail_str or not title or not text:
+        print("Missing required fields")  # 打印缺少字段的信息
+        return Response({'success': False, 'message': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        post = Post.objects.get(no=no)
+    except Post.DoesNotExist:
+        print("Post not found:", no)  # 打印帖子未找到的信息
+        return Response({'success': False, 'message': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        # 确认用户是否存在
+        user = User.objects.get(email=usermail_str)
+
+        # 解析 ISO 8601 格式的日期时间字符串并添加台湾时区
+        if date:
+            date = datetime.fromisoformat(date)
+            # 设置时区为台湾时间
+            taipei_tz = pytz.timezone('Asia/Taipei')
+            date = date.astimezone(taipei_tz)
+        else:
+            date = None
+
+        # 更新帖子
+        post.usermail = user
+        post.title = title
+        post.text = text
+        post.date = date
+        post.save()
+
+        return Response({'success': True})
+    except IntegrityError as e:
+        print(f'IntegrityError: {e}')  # 打印完整性错误信息
+        return Response({'success': False, 'message': 'Integrity error'}, status=status.HTTP_409_CONFLICT)
+    except Exception as e:
+        import traceback
+        print(f'Error in editpost: {e}')
         traceback.print_exc()
         return Response({'success': False, 'message': f'Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
