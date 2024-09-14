@@ -11,5 +11,7 @@ urlpatterns = [
     path('post/detail/<int:no>/', get_post, name='get_post'),
     path('post/message/<int:nopost>/', get_post_message, name='post_message'),
     path('editpost/', editpost, name='editpost'),
-    # path('forget/<pk>/', forget),
+    path('user/posts/', get_user_post, name='get_user_post'),
+    path('editmessage/', editmessage, name='editmessage'),
+    path('deletepost/<int:no>/', deletepost, name='deletepost'),
 ]
