@@ -267,57 +267,6 @@ def editpost(request):
         return Response({'success': False, 'message': f'Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
-def editmessage(request):
-    data = request.data
-    print("Received data:", data)  # 打印接收到的数据
-
-    nopost_id = data.get('nopost')  # 获取要编辑的留言关联的帖子 ID
-    no = data.get('no')  # 获取要编辑的留言 ID
-    text = data.get('text')
-    date_str = data.get('date')  # 获取前端传递的日期时间字符串
-
-    if not no or not text or not nopost_id:
-        print("Missing required fields")  # 打印缺少字段的信息
-        return Response({'success': False, 'message': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
-
-    try:
-        message = Message.objects.get(no=no)
-    except Message.DoesNotExist:
-        print("Message not found:", no)  # 打印留言未找到的信息
-        return Response({'success': False, 'message': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    try:
-        # 查找关联的帖子实例
-        try:
-            post = Post.objects.get(no=nopost_id)
-        except Post.DoesNotExist:
-            print("Post not found:", nopost_id)  # 打印帖子未找到的信息
-            return Response({'success': False, 'message': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        # 解析 ISO 8601 格式的日期时间字符串并添加台湾时区
-        if date_str:
-            date = datetime.fromisoformat(date_str)
-            # 设置时区为台湾时间
-            taipei_tz = pytz.timezone('Asia/Taipei')
-            date = date.astimezone(taipei_tz)
-        else:
-            date = None
-
-        # 更新留言
-        message.text = text
-        message.date = date
-        message.save()
-
-        return Response({'success': True})
-    except IntegrityError as e:
-        print(f'IntegrityError: {e}')  # 打印完整性错误信息
-        return Response({'success': False, 'message': 'Integrity error'}, status=status.HTTP_409_CONFLICT)
-    except Exception as e:
-        print(f'Error in edit_comment: {e}')
-        traceback.print_exc()
-        return Response({'success': False, 'message': f'Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(['POST'])
 def deletepost(request, no):
     try:
         post = Post.objects.get(pk=no)
