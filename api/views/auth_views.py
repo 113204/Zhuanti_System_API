@@ -1,7 +1,11 @@
 import base64
 import bcrypt
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 
 from django.db import IntegrityError
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -77,32 +81,64 @@ def register(request):
 
 
 # 忘記密碼
-@api_view()
-def forget(request, pk):
-    # # 注意：因使用POST，data
-    # data = request.data
-    #
-    # user_id = data.get('user_id')
-    # # get 後面加東西，可能部會成功，故fileter 方便
-    #
-    # user = User.objects.filter(pk=user_id)
-    #
-    # if not user.exists():
-    #     return Response({'success': False, 'message': '沒有此帳號'}, status=status.HTTP_404_NOT_FOUND)
-    #
-    # return Response({'success': True, 'message': '成功找到此帳號'})
+@api_view(['POST'])
+def forget(request):
+    data = request.data
+    email = data.get('email', '').strip()
+
+    if not email:
+        return Response({'success': False, 'message': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        user = User.objects.get(pk=pk)
-    except:
-        return Response({'success': False, 'message': '查無資料'}, status=status.HTTP_404_NOT_FOUND)
+        user = User.objects.get(email=email)
 
-    return Response({
-        'success': True,
-        'message': '即將發送郵件重設密碼',
-        'data':
-            {
-                'id': user.pk
-            }
-    })
+        # 生成重設密碼的令牌和 UID
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
 
+        reset_url = f"http://127.0.0.1:8000/reset-password/{uid}/{token}/"
+
+        # 發送重設密碼郵件
+        send_mail(
+            'Password Reset Request',
+            f"點擊連結以重新設定密碼: {reset_url}",
+            'no-reply@yourdomain.com',
+            [user.email],
+            fail_silently=False,
+        )
+
+        return Response({'success': True, 'message': 'Password reset email sent.'}, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        return Response({'success': False, 'message': 'User with this email does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+def reset_password(request):
+    """
+    根據用戶的 UID 和 Token 驗證身份，並更新密碼。
+    """
+    data = request.data
+    uid = data.get('uid')
+    token = data.get('token')
+    new_password = data.get('password')
+
+    if not uid or not token or not new_password:
+        return Response({'success': False, 'message': 'Invalid data.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # 解碼 UID 並查找用戶
+        uid = force_str(urlsafe_base64_decode(uid))
+        user = User.objects.get(pk=uid)
+
+        # 驗證 token 是否有效
+        if default_token_generator.check_token(user, token):
+            # 如果您已經在前端進行了密碼哈希，則直接保存
+            user.password = new_password  # 這裡是直接設置哈希後的密碼
+            user.save()
+            return Response({'success': True, 'message': 'Password reset successfully.'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'success': False, 'message': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        return Response({'success': False, 'message': 'Invalid user.'}, status=status.HTTP_400_BAD_REQUEST)

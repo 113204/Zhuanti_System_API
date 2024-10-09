@@ -12,10 +12,14 @@ class User(models.Model):
     phone = models.CharField(max_length=15)
     permission = models.IntegerField()
     about = models.CharField(max_length=300)
+    last_login = models.DateTimeField()
 
     class Meta:
         managed = False
         db_table = 'user'
+
+    def get_email_field_name(self):
+        return 'email'
 
 class Post(models.Model):
     no = models.AutoField(primary_key=True)
