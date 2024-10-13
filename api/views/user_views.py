@@ -78,6 +78,7 @@ def user_detail_edit(request):
     except:
         return Response({'success': False}, status=status.HTTP_400_BAD_REQUEST)
 
+# 修改密碼
 @api_view(['POST'])
 # @user_login_required
 def user_pass_edit(request):
