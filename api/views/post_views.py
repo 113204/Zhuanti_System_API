@@ -1,7 +1,6 @@
 import base64
 import traceback
 
-import bcrypt
 import pytz
 
 from django.db import IntegrityError
@@ -40,7 +39,7 @@ def get_all_post(request):
         ]
     })
 
-
+# 抓取特定使用者文章
 @api_view(['GET'])
 def get_user_post(request):
     # # 使用当前用户的 email 来过滤文章

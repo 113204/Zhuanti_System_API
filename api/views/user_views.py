@@ -12,25 +12,25 @@ from utils.decorators import user_login_required
 # 每一個測試的api_view,一次只能取消註解一個
 
 # 使用者列表測試
-@api_view()
-@user_login_required
-def get_user_detail_test(request):
-    users = User.objects.all()
-    # get(pk=pk) all()
-
-    return Response({
-        'success': True,
-        'data': [
-            {
-                'email': user.pk,
-                'name': user.name,
-                'gender': user.gender,
-                # 'live': user.live,
-                'phone': user.phone,
-            }
-            for user in users
-        ]
-    })
+# @api_view()
+# @user_login_required
+# def get_user_detail_test(request):
+#     users = User.objects.all()
+#     # get(pk=pk) all()
+#
+#     return Response({
+#         'success': True,
+#         'data': [
+#             {
+#                 'email': user.pk,
+#                 'name': user.name,
+#                 'gender': user.gender,
+#                 # 'live': user.live,
+#                 'phone': user.phone,
+#             }
+#             for user in users
+#         ]
+#     })
 
 
 # 個人資料顯示頁面
