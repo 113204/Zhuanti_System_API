@@ -66,6 +66,7 @@ def get_user_post(request):
         ]
     })
 
+# 文章內容
 @api_view(['GET'])
 def get_post(request, no):
     try:
@@ -83,6 +84,7 @@ def get_post(request, no):
     except Post.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'Article not found'}, status=404)
 
+# 留言內容
 @api_view(['GET'])
 def get_post_message(request, nopost):
     try:
@@ -215,6 +217,7 @@ def addmessage(request):
         traceback.print_exc()
         return Response({'success': False, 'message': f'Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+# 編輯文章
 @api_view(['POST'])
 def editpost(request):
     data = request.data
@@ -266,6 +269,7 @@ def editpost(request):
         traceback.print_exc()
         return Response({'success': False, 'message': f'Error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+#刪除文章
 @api_view(['POST'])
 def deletepost(request, no):
     try:
