@@ -55,7 +55,7 @@ def get_user_detail(request):
             }
         })
     except User.DoesNotExist:
-        return Response({'success': False, 'message': '用户不存在'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'success': False, 'message': '用戶不存在'}, status=status.HTTP_404_NOT_FOUND)
 
 
 

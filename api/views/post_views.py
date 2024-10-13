@@ -42,13 +42,11 @@ def get_all_post(request):
 # 抓取特定使用者文章
 @api_view(['GET'])
 def get_user_post(request):
-    # # 使用当前用户的 email 来过滤文章
-    # current_user_email = request.user.email
 
     data = request.query_params
     useremail = data.get('email')
 
-    # 获取当前用户的文章
+    # 獲取當前登入用戶文章
     posts = Post.objects.filter(usermail__email=useremail)
 
     return Response({
@@ -87,29 +85,29 @@ def get_post(request, no):
 @api_view(['GET'])
 def get_post_message(request, nopost):
     try:
-        # 确保 `nopost` 是有效的整数
+        # 確保 nopost 為有效整數
         try:
             nopost = int(nopost)
         except ValueError:
             return JsonResponse({'success': False, 'message': 'Invalid `nopost` parameter'}, status=400)
 
-        # 确保 `nopost` 是一个有效的 `Post` 对象
+        # 確保nopost為有效的Post欄位
         try:
             post = Post.objects.get(no=nopost)
         except Post.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Post not found'}, status=404)
 
-        # 获取与 `nopost` 关联的所有消息
+        # 獲取nopost有關所有資訊
         messages = Message.objects.filter(nopost=post)
 
-        # 构建消息列表
+        # 新增留言
         message_list = [
             {
                 'no': message.pk,
-                'nopost': message.nopost.no,  # 确保返回的是 `Post` 的主键
+                'nopost': message.nopost.no,  # 確保是Post的PK
                 'usermail': message.usermail.name if message.usermail else 'Anonymous',
                 'text': message.text,
-                'date': message.date.isoformat(),  # 确保日期时间为 ISO 8601 格式
+                'date': message.date.isoformat(),  # 確保日期時間為 ISO 8601 格式
             }
             for message in messages
         ]
@@ -121,35 +119,35 @@ def get_post_message(request, nopost):
 
     except Exception as e:
         print(f'Error in get_post_message: {e}')
-        traceback.print_exc()  # 打印详细的异常信息
+        traceback.print_exc()
         return JsonResponse({'success': False, 'message': f'Error fetching messages: {str(e)}'}, status=500)
 
 # 新增文章
 @api_view(['POST'])
 def addpost(request):
     data = request.data
-    print("Received data:", data)  # 打印接收到的数据
+    print("Received data:", data)
 
     usermail_str = data.get('usermail')
     title = data.get('title')
     text = data.get('text')
-    date_str = data.get('date')  # 获取前端传递的日期时间字符串
+    date_str = data.get('date')  # 獲取日期時間
 
     if not usermail_str or not title or not text:
-        print("Missing required fields")  # 打印缺少字段的信息
+        print("Missing required fields")
         return Response({'success': False, 'message': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         user = User.objects.get(email=usermail_str)
     except User.DoesNotExist:
-        print("User not found:", usermail_str)  # 打印用户未找到的信息
+        print("User not found:", usermail_str)  # 使用者未找到
         return Response({'success': False, 'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
     try:
-        # 解析 ISO 8601 格式的日期时间字符串并添加台湾时区
+        # 解析 ISO 8601 格式的日期時間並設置為台灣台北時間
         if date_str:
             date = datetime.fromisoformat(date_str)
-            # 设置时区为台湾时间
+            # 設置為台灣台北時間
             taipei_tz = pytz.timezone('Asia/Taipei')
             date = date.astimezone(taipei_tz)
         else:
@@ -158,7 +156,7 @@ def addpost(request):
         Post.objects.create(usermail=user, title=title, text=text, date=date)
         return Response({'success': True})
     except IntegrityError as e:
-        print(f'IntegrityError: {e}')  # 打印完整性错误信息
+        print(f'IntegrityError: {e}')
         return Response({'success': False, 'message': 'Integrity error'}, status=status.HTTP_409_CONFLICT)
     except Exception as e:
         import traceback
@@ -172,43 +170,43 @@ def addmessage(request):
     data = request.data
     print("Received data:", data)  # 打印接收到的数据
 
-    nopost_id = data.get('nopost')  # 关联的帖子编号
-    usermail_str = data.get('usermail')  # 当前登录用户的邮箱
-    text = data.get('text')  # 评论内容
-    date_str = data.get('date')  # 评论时间字符串
+    nopost_id = data.get('nopost')  # 文章編號
+    usermail_str = data.get('usermail')  # 當前登入帳號
+    text = data.get('text')  # 评留言內容
+    date_str = data.get('date')  # 留言時間
 
     if not nopost_id or not usermail_str or not text:
-        print("Missing required fields")  # 打印缺少字段的信息
+        print("Missing required fields")  # 打印缺少欄位
         return Response({'success': False, 'message': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         user = User.objects.get(email=usermail_str)
     except User.DoesNotExist:
-        print("User not found:", usermail_str)  # 打印用户未找到的信息
+        print("User not found:", usermail_str)  # 使用者帳號未找到
         return Response({'success': False, 'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
     try:
-        # 查找关联的帖子实例
+        # 查找文章
         try:
             post = Post.objects.get(no=nopost_id)
         except Post.DoesNotExist:
-            print("Post not found:", nopost_id)  # 打印帖子未找到的信息
+            print("Post not found:", nopost_id)  # 文章未找到
             return Response({'success': False, 'message': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        # 解析 ISO 8601 格式的日期时间字符串并添加台湾时区
+        # 解析 ISO 8601 格式的日期時間並設置為台灣台北時間
         if date_str:
             date = datetime.fromisoformat(date_str)
-            # 设置时区为台湾时间
+            # 設置為台灣台北時區
             taipei_tz = pytz.timezone('Asia/Taipei')
             date = date.astimezone(taipei_tz)
         else:
             date = None
 
-        # 创建新的评论
+        # 新增留言
         Message.objects.create(nopost=post, usermail=user, text=text, date=date)
         return Response({'success': True})
     except IntegrityError as e:
-        print(f'IntegrityError: {e}')  # 打印完整性错误信息
+        print(f'IntegrityError: {e}')
         return Response({'success': False, 'message': 'Integrity error'}, status=status.HTTP_409_CONFLICT)
     except Exception as e:
         import traceback
@@ -220,38 +218,38 @@ def addmessage(request):
 @api_view(['POST'])
 def editpost(request):
     data = request.data
-    print("Received data:", data)  # 打印接收到的数据
+    print("Received data:", data)
 
-    no = data.get('no')  # 获取要编辑的帖子 ID
+    no = data.get('no')  # 獲取要編輯的文章的no
     usermail_str = data.get('usermail')
     title = data.get('title')
     text = data.get('text')
-    date = data.get('date')  # 获取前端传递的日期时间字符串
+    date = data.get('date')  # 獲取發文日期
 
     if not no or not usermail_str or not title or not text:
-        print("Missing required fields")  # 打印缺少字段的信息
+        print("Missing required fields")
         return Response({'success': False, 'message': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         post = Post.objects.get(no=no)
     except Post.DoesNotExist:
-        print("Post not found:", no)  # 打印帖子未找到的信息
+        print("Post not found:", no)  # 文章未找到
         return Response({'success': False, 'message': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
 
     try:
-        # 确认用户是否存在
+        # 確認使用者是否存在
         user = User.objects.get(email=usermail_str)
 
-        # 解析 ISO 8601 格式的日期时间字符串并添加台湾时区
+        # 解析 ISO 8601 格式的日期時間並設置為台灣台北時間
         if date:
             date = datetime.fromisoformat(date)
-            # 设置时区为台湾时间
+            # 設置為台灣台北時間
             taipei_tz = pytz.timezone('Asia/Taipei')
             date = date.astimezone(taipei_tz)
         else:
             date = None
 
-        # 更新帖子
+        # 更新文章
         post.usermail = user
         post.title = title
         post.text = text
@@ -260,7 +258,7 @@ def editpost(request):
 
         return Response({'success': True})
     except IntegrityError as e:
-        print(f'IntegrityError: {e}')  # 打印完整性错误信息
+        print(f'IntegrityError: {e}')
         return Response({'success': False, 'message': 'Integrity error'}, status=status.HTTP_409_CONFLICT)
     except Exception as e:
         import traceback

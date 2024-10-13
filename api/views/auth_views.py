@@ -57,10 +57,6 @@ def login(request):
 def register(request):
     data = request.data
 
-    # # 圖片轉base64字串
-    # photo = request.FILES['photo']
-    # photo_string = str(base64.b64encode(photo.read()))[2:-1]
-
     # 新增使用者資料
     try:
         User.objects.create(email=data['email'], name=data['name'], password=data['password'],
@@ -133,7 +129,7 @@ def reset_password(request):
 
         # 驗證 token 是否有效
         if default_token_generator.check_token(user, token):
-            # 如果您已經在前端進行了密碼哈希，則直接保存
+            # 已經在前端進行了密碼哈希，直接保存
             user.password = new_password  # 這裡是直接設置哈希後的密碼
             user.save()
             return Response({'success': True, 'message': 'Password reset successfully.'}, status=status.HTTP_200_OK)
