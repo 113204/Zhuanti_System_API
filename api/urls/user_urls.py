@@ -9,7 +9,7 @@ urlpatterns = [
     # path('all/', get_all_reviews),
 
     # 下面test/ 供成就相關表格進行測試
-    path('test/', get_user_detail_test),
+    # path('test/', get_user_detail_test),
     path('detail/', get_user_detail),
     path('detail/edit/', user_detail_edit),
     path('pass/edit/', user_pass_edit)
