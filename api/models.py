@@ -21,6 +21,7 @@ class User(models.Model):
     def get_email_field_name(self):
         return 'email'
 
+# 文章
 class Post(models.Model):
     no = models.AutoField(primary_key=True)
     usermail = models.ForeignKey(User, models.DO_NOTHING, db_column='usermail')
@@ -32,6 +33,7 @@ class Post(models.Model):
         managed = False
         db_table = 'discuss_post'
 
+# 留言
 class Message(models.Model):
     no = models.AutoField(primary_key=True)
     nopost = models.ForeignKey(Post, models.DO_NOTHING, db_column='nopost')
@@ -42,3 +44,18 @@ class Message(models.Model):
     class Meta:
         managed = False
         db_table = 'discuss_message'
+
+# 運動紀錄
+class Record(models.Model):
+    no = models.AutoField(primary_key=True)
+    user_email = models.CharField(max_length=45)
+    count = models.IntegerField()
+    datetime = models.DateTimeField()
+    left_errors = models.IntegerField()
+    right_errors = models.IntegerField()
+    sport_time = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'record'
+

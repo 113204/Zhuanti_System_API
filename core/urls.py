@@ -22,4 +22,6 @@ urlpatterns = [
     path('api/auth/', include('api.urls.auth_urls')),
     path('api/user/', include('api.urls.user_urls')),
     path('api/post/', include('api.urls.post_urls')),
+    path('api/record/', include('api.urls.record_urls')),
+    # path('api/record/', include('api.urls.record_urls')),
 ]
