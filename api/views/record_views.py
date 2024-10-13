@@ -5,6 +5,7 @@ from rest_framework import status
 from api.models import Record
 from datetime import datetime
 
+# 新增運動紀錄
 @api_view(['POST'])
 def addrecord(request):
     # 確認使用者是否已登入
@@ -48,5 +49,40 @@ def addrecord(request):
         )
         record.save()
         return Response({"message": "運動紀錄新增成功"}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# 抓取運動紀錄
+@api_view(['GET'])
+def get_user_records(request):
+    # 確認用戶是否已登入
+    if 'email' not in request.session:
+        return Response({"error": "用戶未登入"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    # 從 session 中取得用戶 email
+    user_email = request.session['email']
+
+    # 查找該用戶的運動紀錄
+    try:
+        records = Record.objects.filter(user_email=user_email)  # 根據用戶 email 過濾紀錄
+
+        # 如果沒有找到紀錄
+        if not records.exists():
+            return Response({"message": "沒有找到運動紀錄"}, status=status.HTTP_404_NOT_FOUND)
+
+        # 將紀錄序列化為字典格式
+        records_data = [
+            {
+                "count": record.count,
+                "datetime": record.datetime.strftime("%Y-%m-%d %H:%M:%S"),  # 格式化日期
+                "left_errors": record.left_errors,
+                "right_errors": record.right_errors,
+                "sport_time": record.sport_time,
+            }
+            for record in records
+        ]
+
+        return Response({"records": records_data}, status=status.HTTP_200_OK)
+
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

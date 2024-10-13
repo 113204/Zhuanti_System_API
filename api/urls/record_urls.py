@@ -7,4 +7,5 @@ app_name = 'record'
 
 urlpatterns = [
     path('record/', addrecord),
+    path('getrecord/', get_user_records),
 ]
