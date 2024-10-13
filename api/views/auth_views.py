@@ -112,7 +112,7 @@ def forget(request):
     except User.DoesNotExist:
         return Response({'success': False, 'message': 'User with this email does not exist.'}, status=status.HTTP_404_NOT_FOUND)
 
-
+# 忘記密碼重設
 @api_view(['POST'])
 def reset_password(request):
     """
