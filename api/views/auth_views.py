@@ -38,14 +38,14 @@ def login(request):
         user = User.objects.get(pk=data['email'])
         hashed_password_from_db = user.password
 
-        # 使用 bcrypt 的 checkpw 函数验证密码
+        # 使用 bcrypt 的 checkpw 函數驗證密碼
         if bcrypt.checkpw(data['password'].encode('utf-8'), hashed_password_from_db.encode('utf-8')):
-            # 密码匹配，进行登录操作
+            # 密碼一致，進行登入
             request.session['email'] = user.email
             request.session.save()
             return Response({'success': True, 'sessionid': request.session.session_key})
         else:
-            # 密码不匹配，返回登录页面并显示错误消息
+            # 密碼不一致，返回登入頁面並跳錯誤提示
             return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)
 
     except User.DoesNotExist:
