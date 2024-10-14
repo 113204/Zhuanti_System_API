@@ -8,12 +8,8 @@ from datetime import datetime
 # 新增運動紀錄
 @api_view(['POST'])
 def addrecord(request):
-    # 確認使用者是否已登入
-    if 'email' not in request.session:
-        return Response({"error": "使用者未登入"}, status=status.HTTP_401_UNAUTHORIZED)
-
-    # 從 session 取得使用者 email
-    user_email = request.session['email']
+    # 從請求中取得使用者 email
+    user_email = request.data.get('email')  # 假设您从请求数据中获取 email
 
     # 從請求中取得其他資料
     count = request.data.get('count')
@@ -23,7 +19,7 @@ def addrecord(request):
     sport_time = request.data.get('sport_time')
 
     # 驗證欄位是否為空
-    if not all([count, datetime_str, sport_time]):
+    if not all([user_email, count, datetime_str, sport_time]):
         return Response({"error": "缺少必要的欄位"}, status=status.HTTP_400_BAD_REQUEST)
 
     # 調整時間格式並改為台灣台北時區
@@ -55,12 +51,8 @@ def addrecord(request):
 # 抓取運動紀錄
 @api_view(['GET'])
 def get_user_records(request):
-    # 確認用戶是否已登入
-    if 'email' not in request.session:
-        return Response({"error": "用戶未登入"}, status=status.HTTP_401_UNAUTHORIZED)
-
-    # 從 session 中取得用戶 email
-    user_email = request.session['email']
+    # 從請求中取得用戶 email
+    user_email = request.query_params.get('email')  # 假设您从查询参数中获取 email
 
     # 查找該用戶的運動紀錄
     try:
