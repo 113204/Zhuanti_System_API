@@ -8,15 +8,16 @@ from datetime import datetime
 # 新增運動紀錄
 @api_view(['POST'])
 def addrecord(request):
+    data = request.data
     # 從請求中取得使用者 email
-    user_email = request.data.get('email')  # 假设您从请求数据中获取 email
+    user_email = data.get('user_email')  # 確保此名稱與請求中的一致
 
     # 從請求中取得其他資料
-    count = request.data.get('count')
-    datetime_str = request.data.get('datetime')
-    left_errors = request.data.get('left_errors', 0)
-    right_errors = request.data.get('right_errors', 0)
-    sport_time = request.data.get('sport_time')
+    count = data.get('count')
+    datetime_str = data.get('datetime')
+    left_errors = data.get('left_errors')
+    right_errors = data.get('right_errors')
+    sport_time = data.get('sport_time')
 
     # 驗證欄位是否為空
     if not all([user_email, count, datetime_str, sport_time]):
@@ -24,14 +25,11 @@ def addrecord(request):
 
     # 調整時間格式並改為台灣台北時區
     try:
-        # 將字串轉為 datetime
-        datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
-
-        # 設置為台灣台北時間
+        datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S")  # 使用 ISO 格式
         taipei_tz = pytz.timezone('Asia/Taipei')
-        datetime_obj = taipei_tz.localize(datetime_obj)  # 將 datetime 設為台灣台北時間
+        datetime_obj = taipei_tz.localize(datetime_obj)
     except ValueError:
-        return Response({"error": "日期時間格式不正確，應為 'YYYY-MM-DD HH:MM:SS'"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "日期時間格式不正確，應為 'YYYY-MM-DDTHH:MM:SS'"}, status=status.HTTP_400_BAD_REQUEST)
 
     # 建立運動紀錄
     try:
